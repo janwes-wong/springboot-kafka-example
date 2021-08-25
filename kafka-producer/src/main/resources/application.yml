@@ -1,0 +1,26 @@
+# 服务端口号
+server:
+  port: 8860
+spring:
+  application:
+    # 服务应用名
+    name: kafka-producer
+  # kafka配置
+  kafka:
+    # 配置连接到服务端集群的配置项 配置格式：host1:port1,host2:port2,...
+    bootstrap-servers: localhost:9092
+    # 消息生产者配置
+    producer:
+      # 当有多个消息需要被发送到同一个分区时，生产者会把它们放在同一个批次里。该参数指定了一个批次可以使用的内存大小，按照字节数计算
+      batch-size: 16384
+      # 设置生产者内存缓冲区的大小
+      buffer-memory: 33554432
+      # 键的序列化方式
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # 值的序列化方式
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # 错误重试连接次数
+      retries: 10
+      # acks=0 ： 生产者在成功写入消息之前不会等待任何来自服务器的响应。
+      # acks=1 ： 只要集群的首领节点收到消息，生产者就会收到一个来自服务器成功响应。
+      # acks=all ：只有当所有参与复制的节点全部收到消息时，生产者才会收到一个来自服务器的成功响应。
