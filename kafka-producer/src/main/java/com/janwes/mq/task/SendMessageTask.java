@@ -22,9 +22,10 @@ public class SendMessageTask {
     private KafkaTemplate<String, String> kafkaTemplate;
 
     /**
-     * 定时任务发送消息 每隔10s发送一次
+     * 定时任务发送消息 每隔30s发送一次
+     * 59 59 23 * * ? 每天的23:59:59执行发送消息任务
      */
-    @Scheduled(cron = "0/10 * * * * ? ")
+    @Scheduled(cron = "0/30 * * * * ?")
     public void sendMessage() {
         log.info(">>> send message task start....");
         kafkaTemplate.send("topic-test-110", "你好，我来自2050年...");
