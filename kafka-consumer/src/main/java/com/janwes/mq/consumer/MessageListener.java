@@ -13,7 +13,7 @@ import java.util.Objects;
  * @version 1.0
  * @package com.janwes.mq.consumer
  * @date 2021/8/25 15:38
- * @description
+ * @description 消息监听
  */
 @Slf4j
 @Component

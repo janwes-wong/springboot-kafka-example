@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.util.concurrent.FailureCallback;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.util.concurrent.SuccessCallback;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +31,7 @@ public class SendMessageController {
     public static boolean flag = false;
 
     /**
-     * 带回调方法的消息生产者
+     * 带回调方法的消息生产者（实现方法一）
      *
      * @param msgContent 消息内容
      * @return
@@ -56,6 +57,41 @@ public class SendMessageController {
             @Override
             public void onFailure(Throwable throwable) {
                 log.info(">>> send message failure", throwable.getMessage());
+            }
+        });
+        if (flag) {
+            return "发送成功";
+        }
+        return "发送失败";
+    }
+
+    /**
+     * 带回调方法的消息生产者（实现方法二）
+     *
+     * @param msgContent 消息内容
+     * @return
+     */
+    @GetMapping("/sendMessage/{msgContent}")
+    public String sendMessage(@PathVariable("msgContent") String msgContent) {
+        // kafkaTemplate提供了一个回调方法addCallback，可以在回调方法中监控消息是否发送成功 或 失败时做补偿处理
+        kafkaTemplate.send("topic-test-120", msgContent).addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
+            // 消息发送失败处理
+            @Override
+            public void onFailure(Throwable throwable) {
+                log.info(">>> send message failure", throwable.getMessage());
+            }
+
+            // 消息发送成功处理
+            @Override
+            public void onSuccess(SendResult<String, String> stringStringSendResult) {
+                // 消息发送到的topic
+                String topic = stringStringSendResult.getRecordMetadata().topic();
+                // 消息发送到的分区
+                int partition = stringStringSendResult.getRecordMetadata().partition();
+                // 消息在分区内的offset
+                long offset = stringStringSendResult.getRecordMetadata().offset();
+                log.info(">>> send message success,topic-{},partition-{},offset-{}", topic, partition, offset);
+                flag = true;
             }
         });
         if (flag) {
