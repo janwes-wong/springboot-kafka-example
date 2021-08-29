@@ -26,4 +26,11 @@ public class KafkaMessageTest {
     public void sendMessage() {
         kafkaTemplate.send("topic-test-110", "hello world");
     }
+
+    @Test
+    public void sendMsg() {
+        for (int i = 0; i < 100; i++) {
+            kafkaTemplate.send("topic-test-140", i + "");
+        }
+    }
 }
